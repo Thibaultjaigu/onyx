@@ -7,20 +7,13 @@ from onyx.configs.constants import DocumentSource
 from onyx.connectors.factory import build_connector_kwargs
 from onyx.connectors.registry import CONNECTOR_CLASS_MAP, ConnectorMapping
 
-_TYPED_MAPPINGS = [
-    (source, mapping)
-    for source, mapping in CONNECTOR_CLASS_MAP.items()
-    if mapping.config_class is not None
-]
-
 
 @pytest.mark.parametrize(
     "mapping",
-    [mapping for _, mapping in _TYPED_MAPPINGS],
-    ids=[source.value for source, _ in _TYPED_MAPPINGS],
+    list(CONNECTOR_CLASS_MAP.values()),
+    ids=[source.value for source in CONNECTOR_CLASS_MAP],
 )
 def test_config_model_matches_connector_init(mapping: ConnectorMapping) -> None:
-    assert mapping.config_class is not None
     connector_class = getattr(  # ods: ignore[getattr]
         importlib.import_module(mapping.module_path), mapping.class_name
     )
